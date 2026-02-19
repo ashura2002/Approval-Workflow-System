@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma.service';
-import { RegisterUserDTO } from './dto/register.dto';
+import { RegisterAdminUserDTO } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +13,7 @@ export class AuthService {
   ) {}
 
   // register as admin
-  async registerAsAdmin(dto: RegisterUserDTO) {
+  async registerAsAdmin(dto: RegisterAdminUserDTO) {
     const { username, email, password } = dto;
     const existingUsername =
       await this.userService.findUserByUsername(username);
@@ -27,6 +28,7 @@ export class AuthService {
       data: {
         ...dto,
         password: hash,
+        role: Role.Admin,
       },
       select: this.userService.userSelectedFields,
     });

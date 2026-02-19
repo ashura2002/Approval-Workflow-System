@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterUserDTO } from './dto/register.dto';
+import { RegisterAdminUserDTO } from './dto/register.dto';
 import { UserWithOutPassword } from './dto/userwithoutpassword.dto';
 
 @Controller('auth')
@@ -9,7 +9,7 @@ export class AuthController {
 
   @Post('register')
   async registerAsAdmin(
-    @Body() dto: RegisterUserDTO,
+    @Body() dto: RegisterAdminUserDTO,
   ): Promise<{ message: string; data: UserWithOutPassword }> {
     const user = await this.authService.registerAsAdmin(dto);
     return { message: 'Created Successfully', data: user };
