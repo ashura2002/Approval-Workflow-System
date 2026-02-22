@@ -23,6 +23,13 @@ export class UsersService {
     return user;
   }
 
+  async getCurrentUser(userId: number): Promise<UserWithOutPassword> {
+    return await this.prismaService.user.findUnique({
+      where: { id: userId },
+      select: this.userSelectedFields,
+    });
+  }
+
   // getter function
   get userSelectedFields() {
     return {

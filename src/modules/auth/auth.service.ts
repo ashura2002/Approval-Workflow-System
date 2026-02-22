@@ -7,11 +7,10 @@ import { PrismaService } from 'src/common/prisma.service';
 import { RegisterAdminUserDTO } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
-import { Role } from '@prisma/client';
 import { LoginDTO } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { IJwtResponse } from 'src/common/types/IJwtResponse.type';
-import { ControllerResponse } from 'src/common/types/controller.response.type';
+import { JwtResponseType } from 'src/common/types/IJwtResponse.type';
+import { UserWithOutPassword } from './dto/userwithoutpassword.dto';
 
 @Injectable()
 export class AuthService {
@@ -22,24 +21,47 @@ export class AuthService {
   ) {}
 
   // register as admin
-  async register(dto: RegisterAdminUserDTO) {
-    const { username, email, password } = dto;
-    const existingUsername =
-      await this.userService.findUserByUsername(username);
-    if (existingUsername)
-      throw new BadRequestException('Username is already been used.');
-    const existingEmail = await this.userService.findUserByEmail(email);
-    if (existingEmail)
-      throw new BadRequestException('Email is already been used.');
+  // creation of admin must be the same as creation of company
+  async registerAsAdmin(
+    dto: RegisterAdminUserDTO,
+  ): Promise<UserWithOutPassword> {
+    const { username, email, password, company, description } = dto;
+    const existedUsername = await this.userService.findUserByUsername(username);
+    if (existedUsername)
+      throw new BadRequestException(`${username} is already taken. Try again`);
+    const existedEmail = await this.userService.findUserByEmail(email);
+    if (existedEmail) throw new BadRequestException('Email already used.');
+    const hash = await bcrypt.hash(password, 10);
 
-    const hash = bcrypt.hashSync(password, 10);
-    return await this.prismaService.user.create({
-      data: {
-        ...dto,
-        password: hash,
-        role: Role.Admin,
-      },
-      select: this.userService.userSelectedFields,
+    return this.prismaService.$transaction(async (tx) => {
+      // create company
+      const newCompany = await tx.company.create({
+        data: {
+          companyName: company,
+          description: description,
+        },
+      });
+
+      // default role
+      const adminRole = await tx.role.create({
+        data: {
+          roleName: 'Admin',
+          companyId: newCompany.id,
+        },
+      });
+
+      // create user
+      const user = await tx.user.create({
+        data: {
+          username,
+          email,
+          password: hash,
+          companyId: newCompany.id,
+          roleId: adminRole.id,
+        },
+        select: this.userService.userSelectedFields,
+      });
+      return user;
     });
   }
 
@@ -54,10 +76,9 @@ export class AuthService {
     const isPasswordMatch = bcrypt.compareSync(password, user.password);
     if (!isPasswordMatch) throw new BadRequestException('Invalid credentials');
 
-    const tokenPayload: IJwtResponse = {
+    const tokenPayload: JwtResponseType = {
       userId: user.id,
       email: user.email,
-      role: user.role,
       username: user.username,
     };
 

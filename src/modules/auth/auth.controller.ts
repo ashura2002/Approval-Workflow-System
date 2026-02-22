@@ -1,20 +1,20 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterAdminUserDTO } from './dto/register.dto';
-import { UserWithOutPassword } from './dto/userwithoutpassword.dto';
 import { ControllerResponse } from 'src/common/types/controller.response.type';
 import { LoginDTO } from './dto/login.dto';
+import { UserWithOutPassword } from './dto/userwithoutpassword.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async register(
+  async registerAsAdmin(
     @Body() dto: RegisterAdminUserDTO,
   ): Promise<ControllerResponse<UserWithOutPassword>> {
-    const user = await this.authService.register(dto);
-    return { message: 'Created Successfully', data: user };
+    const user = await this.authService.registerAsAdmin(dto);
+    return { message: 'Successfully Created', data: user };
   }
 
   @Post('login')
