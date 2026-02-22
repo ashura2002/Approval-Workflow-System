@@ -1,10 +1,6 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma.service';
-import { RegisterAdminUserDTO } from './dto/register.dto';
+import { RegisterUserDTO } from './dto/registerUser.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { LoginDTO } from './dto/login.dto';
@@ -12,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtResponseType } from 'src/common/types/IJwtResponse.type';
 import { UserWithOutPassword } from './dto/userwithoutpassword.dto';
 import { Role } from '@prisma/client';
+import { CompanyService } from '../company/company.service';
 
 @Injectable()
 export class AuthService {
@@ -19,11 +16,10 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly companyService: CompanyService,
   ) {}
 
-  async registerAsAdmin(
-    dto: RegisterAdminUserDTO,
-  ): Promise<UserWithOutPassword> {
+  async registerAsAdmin(dto: RegisterUserDTO): Promise<UserWithOutPassword> {
     const { username, email, password, company, description } = dto;
     const existedUsername = await this.userService.findUserByUsername(username);
     if (existedUsername)
@@ -31,6 +27,10 @@ export class AuthService {
     const existedEmail = await this.userService.findUserByEmail(email);
     if (existedEmail) throw new BadRequestException('Email already used.');
     const hash = await bcrypt.hash(password, 10);
+
+    const existedCompany = await this.companyService.findCompanyByName(company);
+    if (existedCompany)
+      throw new BadRequestException(`${company} is already existed`);
 
     return await this.prismaService.$transaction(async (tx) => {
       // create company when creating admin user
@@ -54,6 +54,29 @@ export class AuthService {
       });
       return newUser;
     });
+  }
+
+  // apply DRY CONCEPT 
+  async registerAsUser(dto: RegisterUserDTO, userId: number): Promise<any> {
+    const { username, email, password } = dto;
+    const currentUser = await this.userService.findUserById(userId);
+    const existedUsername = await this.userService.findUserByUsername(username);
+    if (existedUsername)
+      throw new BadRequestException('Username is already used.');
+    const existedEmail = await this.userService.findUserByEmail(email);
+    if (existedEmail) throw new BadRequestException('Email already used');
+    const hash = await bcrypt.hash(password, 10);
+
+    const employee = await this.prismaService.user.create({
+      data: {
+        username,
+        password: hash,
+        email,
+        role: Role.Employee,
+        companyId: currentUser.companyId,
+      },
+    });
+    return employee;
   }
 
   async login(dto: LoginDTO): Promise<string> {

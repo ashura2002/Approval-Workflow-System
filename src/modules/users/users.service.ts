@@ -23,6 +23,12 @@ export class UsersService {
     return user;
   }
 
+  async findUserById(userId: number): Promise<UserWithOutPassword> {
+    return await this.prismaService.user.findUnique({
+      where: { id: userId },
+    });
+  }
+
   async getAllusersOnOwnCompany(
     companyId: number,
   ): Promise<UserWithOutPassword[]> {
