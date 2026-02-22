@@ -23,6 +23,15 @@ export class UsersService {
     return user;
   }
 
+  async getAllusersOnOwnCompany(
+    companyId: number,
+  ): Promise<UserWithOutPassword[]> {
+    return await this.prismaService.user.findMany({
+      where: { companyId },
+      select: this.userSelectedFields,
+    });
+  }
+
   async getCurrentUser(userId: number): Promise<UserWithOutPassword> {
     return await this.prismaService.user.findUnique({
       where: { id: userId },
