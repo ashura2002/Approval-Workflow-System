@@ -11,6 +11,7 @@ import { LoginDTO } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtResponseType } from 'src/common/types/IJwtResponse.type';
 import { UserWithOutPassword } from './dto/userwithoutpassword.dto';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -20,8 +21,6 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  // register as admin
-  // creation of admin must be the same as creation of company
   async registerAsAdmin(
     dto: RegisterAdminUserDTO,
   ): Promise<UserWithOutPassword> {
@@ -33,8 +32,8 @@ export class AuthService {
     if (existedEmail) throw new BadRequestException('Email already used.');
     const hash = await bcrypt.hash(password, 10);
 
-    return this.prismaService.$transaction(async (tx) => {
-      // create company
+    return await this.prismaService.$transaction(async (tx) => {
+      // create company when creating admin user
       const newCompany = await tx.company.create({
         data: {
           companyName: company,
@@ -42,46 +41,37 @@ export class AuthService {
         },
       });
 
-      // default role
-      const adminRole = await tx.role.create({
-        data: {
-          roleName: 'Admin',
-          companyId: newCompany.id,
-        },
-      });
-
-      // create user
-      const user = await tx.user.create({
+      // creating user
+      const newUser = await tx.user.create({
         data: {
           username,
           email,
           password: hash,
+          role: Role.Admin,
           companyId: newCompany.id,
-          roleId: adminRole.id,
         },
         select: this.userService.userSelectedFields,
       });
-      return user;
+      return newUser;
     });
   }
 
   async login(dto: LoginDTO): Promise<string> {
     const { username, password } = dto;
-    const user = await this.prismaService.user.findUnique({
-      where: {
-        username,
-      },
+    const existingUser = await this.prismaService.user.findUnique({
+      where: { username },
     });
-    if (!user) throw new NotFoundException('User not found');
-    const isPasswordMatch = bcrypt.compareSync(password, user.password);
-    if (!isPasswordMatch) throw new BadRequestException('Invalid credentials');
+    if (!existingUser) throw new BadRequestException('User not found');
+    const isHash = await bcrypt.compare(password, existingUser.password);
+    if (!isHash) throw new BadRequestException('Invalid Credentials');
 
     const tokenPayload: JwtResponseType = {
-      userId: user.id,
-      email: user.email,
-      username: user.username,
+      userId: existingUser.id,
+      username: existingUser.username,
+      email: existingUser.email,
+      role: existingUser.role,
+      companyId: existingUser.companyId,
     };
-
     const accessToken = this.jwtService.sign(tokenPayload);
     return accessToken;
   }
