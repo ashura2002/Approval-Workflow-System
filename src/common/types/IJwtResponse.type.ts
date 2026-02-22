@@ -1,6 +1,5 @@
-export type IJwtResponse = {
+export type JwtResponseType = {
   userId: number;
   username: string;
-  role: string;
   email: string;
 };

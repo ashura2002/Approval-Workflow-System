@@ -8,7 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { IJwtResponse } from '../types/IJwtResponse.type';
+import { JwtResponseType } from '../types/IJwtResponse.type';
 
 @Injectable()
 export class JwtGuard implements CanActivate {
@@ -23,7 +23,7 @@ export class JwtGuard implements CanActivate {
     if (!accessToken) throw new UnauthorizedException('No token provided');
 
     try {
-      const payload: IJwtResponse = await this.jwtService.verifyAsync(
+      const payload: JwtResponseType = await this.jwtService.verifyAsync(
         accessToken,
         {
           secret: this.configService.get<string>('JWT_SECRET'),
