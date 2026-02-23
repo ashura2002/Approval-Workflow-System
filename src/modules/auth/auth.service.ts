@@ -73,6 +73,13 @@ export class AuthService {
     return await this.register(dto, userId, Role.DepartmentHead);
   }
 
+  async registerAsHr(
+    dto: RegisterUserDTO,
+    userId: number,
+  ): Promise<UserWithOutPassword> {
+    return await this.register(dto, userId, Role.HR);
+  }
+
   async login(dto: LoginDTO): Promise<string> {
     const { username, password } = dto;
     const existingUser = await this.prismaService.user.findUnique({
