@@ -1,12 +1,22 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ControllerResponse } from 'src/common/types/controller.response.type';
 import { LoginDTO } from './dto/login.dto';
 import { UserWithOutPassword } from './dto/userwithoutpassword.dto';
 import { Role } from '@prisma/client';
 import { Roles } from 'src/common/decorators/role.decorator';
-import { RegisterUserDTO } from './dto/registerUser.dto';
+import { RegisterAdminUserDTO } from './dto/registerAdminUser.dto';
 import { AuthUser } from 'src/common/types/auth.user.types';
+import { JwtGuard } from 'src/common/guard/jwt.guard';
+import { RegisterUserDTO } from './dto/registerUser.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -15,16 +25,39 @@ export class AuthController {
   @Post('register-admin')
   @HttpCode(HttpStatus.CREATED)
   async registerAsAdmin(
-    @Body() dto: RegisterUserDTO,
+    @Body() dto: RegisterAdminUserDTO,
   ): Promise<ControllerResponse<UserWithOutPassword>> {
     const user = await this.authService.registerAsAdmin(dto);
-    return { message: 'Successfully Created', data: user };
+    return { message: 'Created Successfully', data: user };
   }
 
-  @Post('regiter-user')
+  @Post('register-employee')
+  @UseGuards(JwtGuard)
   @Roles(Role.Admin)
   @HttpCode(HttpStatus.CREATED)
-  async registerUser(@Body() dto: RegisterUserDTO, @Req() userId: AuthUser): Promise<any> {}
+  async registerAsEmployee(
+    @Body() dto: RegisterUserDTO,
+    @Req() req: AuthUser,
+  ): Promise<ControllerResponse<UserWithOutPassword>> {
+    const { userId } = req.user;
+    const user = await this.authService.registerAsEmployee(dto, userId);
+    return { message: 'Created Successfully', data: user };
+  }
+
+  @Post('register-departmentHead')
+  @UseGuards(JwtGuard)
+  @Roles(Role.Admin)
+  @HttpCode(HttpStatus.CREATED)
+  async registerAsDepartmentHead(
+    @Body() dto: RegisterUserDTO,
+    @Req() req: AuthUser,
+  ): Promise<ControllerResponse<UserWithOutPassword>> {
+    const { userId } = req.user;
+    const user = await this.authService.registerAsDepartmentHead(dto, userId);
+    return { message: 'Created Successfully', data: user };
+  }
+
+// endpoints for creating HR
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
