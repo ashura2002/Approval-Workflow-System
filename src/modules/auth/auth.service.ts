@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma.service';
-import { RegisterUserDTO } from './dto/registerUser.dto';
+import { RegisterAdminUserDTO } from './dto/registerAdminUser.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { LoginDTO } from './dto/login.dto';
@@ -9,6 +9,7 @@ import { JwtResponseType } from 'src/common/types/IJwtResponse.type';
 import { UserWithOutPassword } from './dto/userwithoutpassword.dto';
 import { Role } from '@prisma/client';
 import { CompanyService } from '../company/company.service';
+import { RegisterUserDTO } from './dto/registerUser.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,9 @@ export class AuthService {
     private readonly companyService: CompanyService,
   ) {}
 
-  async registerAsAdmin(dto: RegisterUserDTO): Promise<UserWithOutPassword> {
+  async registerAsAdmin(
+    dto: RegisterAdminUserDTO,
+  ): Promise<UserWithOutPassword> {
     const { username, email, password, company, description } = dto;
     const existedUsername = await this.userService.findUserByUsername(username);
     if (existedUsername)
@@ -56,27 +59,18 @@ export class AuthService {
     });
   }
 
-  // apply DRY CONCEPT 
-  async registerAsUser(dto: RegisterUserDTO, userId: number): Promise<any> {
-    const { username, email, password } = dto;
-    const currentUser = await this.userService.findUserById(userId);
-    const existedUsername = await this.userService.findUserByUsername(username);
-    if (existedUsername)
-      throw new BadRequestException('Username is already used.');
-    const existedEmail = await this.userService.findUserByEmail(email);
-    if (existedEmail) throw new BadRequestException('Email already used');
-    const hash = await bcrypt.hash(password, 10);
+  async registerAsEmployee(
+    dto: RegisterUserDTO,
+    userId: number,
+  ): Promise<UserWithOutPassword> {
+    return await this.register(dto, userId, Role.Employee);
+  }
 
-    const employee = await this.prismaService.user.create({
-      data: {
-        username,
-        password: hash,
-        email,
-        role: Role.Employee,
-        companyId: currentUser.companyId,
-      },
-    });
-    return employee;
+  async registerAsDepartmentHead(
+    dto: RegisterUserDTO,
+    userId: number,
+  ): Promise<UserWithOutPassword> {
+    return await this.register(dto, userId, Role.DepartmentHead);
   }
 
   async login(dto: LoginDTO): Promise<string> {
@@ -97,5 +91,32 @@ export class AuthService {
     };
     const accessToken = this.jwtService.sign(tokenPayload);
     return accessToken;
+  }
+
+  async register(
+    dto: RegisterUserDTO,
+    userId: number,
+    role: Role,
+  ): Promise<UserWithOutPassword> {
+    const { username, email, password } = dto;
+    const currentUser = await this.userService.findUserById(userId);
+    const existedUsername = await this.userService.findUserByUsername(username);
+    if (existedUsername)
+      throw new BadRequestException('Username is already used.');
+    const existedEmail = await this.userService.findUserByEmail(email);
+    if (existedEmail) throw new BadRequestException('Email already used');
+    const hash = await bcrypt.hash(password, 10);
+
+    const newUser = await this.prismaService.user.create({
+      data: {
+        username,
+        password: hash,
+        email,
+        role,
+        companyId: currentUser.companyId,
+      },
+      select: this.userService.userSelectedFields,
+    });
+    return newUser;
   }
 }

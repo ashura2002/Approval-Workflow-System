@@ -12,4 +12,10 @@ export class CompanyService {
     });
     return company;
   }
+
+  async getOwnCompany(companyId: number): Promise<Company> {
+    return await this.prismaService.company.findUnique({
+      where: { id: companyId },
+    });
+  }
 }
