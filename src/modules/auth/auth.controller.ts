@@ -57,7 +57,19 @@ export class AuthController {
     return { message: 'Created Successfully', data: user };
   }
 
-// endpoints for creating HR
+  // endpoints for creating HR
+  @Post('register-hr')
+  @UseGuards(JwtGuard)
+  @Roles(Role.Admin)
+  @HttpCode(HttpStatus.CREATED)
+  async registerAsHr(
+    @Body() dto: RegisterUserDTO,
+    @Req() req: AuthUser,
+  ): Promise<ControllerResponse<UserWithOutPassword>> {
+    const { userId } = req.user;
+    const user = await this.authService.registerAsHr(dto, userId);
+    return { message: 'Created Successfully', data: user };
+  }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
