@@ -11,7 +11,3 @@ import { JwtModule } from '@nestjs/jwt';
   exports: [UsersService],
 })
 export class UsersModule {}
-
-
-// PROGRESS
-// added roleId and companyId on the token payload

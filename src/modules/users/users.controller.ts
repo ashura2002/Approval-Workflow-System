@@ -3,6 +3,8 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseIntPipe,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -36,4 +38,19 @@ export class UsersController {
     const { companyId } = req.user;
     return this.usersService.getAllusersOnOwnCompany(companyId);
   }
+
+  @Get('details/:id')
+  @HttpCode(HttpStatus.OK)
+  @Roles(Role.Admin, Role.DepartmentHead, Role.HR)
+  async getUserById(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: AuthUser,
+  ): Promise<UserWithOutPassword> {
+    const { userId } = req.user;
+    return await this.usersService.findOneUserWithSameCompany(id, userId);
+  }
+
+  // todo
+  // update
+  // delete
 }
