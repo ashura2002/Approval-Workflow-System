@@ -21,7 +21,6 @@ export class RolesGuard implements CanActivate {
 
     const loginUser: JwtResponseType = context.switchToHttp().getRequest().user;
     if (!loginUser || !loginUser.role) return false;
-    console.log(loginUser);
 
     return requiredRoles.includes(loginUser.role);
   }

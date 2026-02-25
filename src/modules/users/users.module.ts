@@ -12,6 +12,8 @@ import { JwtModule } from '@nestjs/jwt';
 })
 export class UsersModule {}
 
-
-// PROGRESS
-// added roleId and companyId on the token payload
+// todo
+// delete
+// company modules
+// request modules
+// approval workflow

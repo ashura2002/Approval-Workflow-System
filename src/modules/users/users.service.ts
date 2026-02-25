@@ -1,6 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma.service';
 import { UserWithOutPassword } from '../auth/dto/userwithoutpassword.dto';
+import { UpdateUserDTO } from './dto/updateUser.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -23,10 +29,32 @@ export class UsersService {
     return user;
   }
 
-  async findUserById(userId: number): Promise<UserWithOutPassword> {
+  async findUserById(id: number): Promise<UserWithOutPassword> {
     return await this.prismaService.user.findUnique({
-      where: { id: userId },
+      where: { id },
+      select: this.userSelectedFields,
     });
+  }
+
+  async findOneUserWithSameCompany(
+    userId: number,
+    currentUserId: number,
+  ): Promise<UserWithOutPassword> {
+    const currentUser = await this.prismaService.user.findUnique({
+      where: { id: currentUserId },
+      select: this.userSelectedFields,
+    });
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+      select: this.userSelectedFields,
+    });
+    if (!currentUser || !user) throw new NotFoundException('User not found');
+
+    if (user.companyId !== currentUser.companyId)
+      throw new BadRequestException(
+        'You can only see employee on your own company',
+      );
+    return user;
   }
 
   async getAllusersOnOwnCompany(
@@ -43,6 +71,32 @@ export class UsersService {
       where: { id: userId },
       select: this.userSelectedFields,
     });
+  }
+
+  async getUserById(userId: number): Promise<UserWithOutPassword> {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+      select: this.userSelectedFields,
+    });
+    if (!user) throw new BadRequestException('User not found');
+    return user;
+  }
+
+  async updateUser(
+    id: number,
+    dto: UpdateUserDTO,
+    userId: number,
+  ): Promise<UserWithOutPassword> {
+    const { password } = dto;
+    await this.findOneUserWithSameCompany(id, userId);
+    const hash = await bcrypt.hash(password, 10);
+    const updatedUser = await this.prismaService.user.update({
+      where: { id: id },
+      data: { ...dto, password: hash },
+      select: this.userSelectedFields,
+    });
+
+    return updatedUser;
   }
 
   // getter function
