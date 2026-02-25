@@ -1,10 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Company } from '@prisma/client';
 import { PrismaService } from 'src/common/prisma.service';
+import { UpdateCompanyDTO } from './dto/updateCompany.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class CompanyService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly userService: UsersService,
+  ) {}
 
   async findCompanyByName(companyName: string): Promise<Company | null> {
     const company = await this.prismaService.company.findUnique({
@@ -17,5 +22,24 @@ export class CompanyService {
     return await this.prismaService.company.findUnique({
       where: { id: companyId },
     });
+  }
+
+  async updateCompany(
+    companyId: number,
+    userId: number,
+    dto: UpdateCompanyDTO,
+  ): Promise<any> {
+    const company = await this.prismaService.company.findUnique({
+      where: { id: companyId },
+    });
+    const user = await this.userService.findUserById(userId);
+    if (company.id !== user.companyId)
+      throw new BadRequestException('You can only update your own company.');
+
+    const updatedCompany = await this.prismaService.company.update({
+      where: { id: company.id },
+      data: { ...dto },
+    });
+    return updatedCompany;
   }
 }
