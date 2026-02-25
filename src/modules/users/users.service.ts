@@ -99,6 +99,13 @@ export class UsersService {
     return updatedUser;
   }
 
+  async deleteUser(userId: number, currentUserId: number): Promise<void> {
+    const user = await this.findOneUserWithSameCompany(userId, currentUserId);
+    await this.prismaService.user.delete({
+      where: { id: user.id },
+    });
+  }
+
   // getter function
   get userSelectedFields() {
     return {
