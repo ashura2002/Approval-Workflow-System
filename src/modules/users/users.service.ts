@@ -5,6 +5,8 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma.service';
 import { UserWithOutPassword } from '../auth/dto/userwithoutpassword.dto';
+import { UpdateUserDTO } from './dto/updateUser.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -37,7 +39,7 @@ export class UsersService {
   async findOneUserWithSameCompany(
     userId: number,
     currentUserId: number,
-  ): Promise<any> {
+  ): Promise<UserWithOutPassword> {
     const currentUser = await this.prismaService.user.findUnique({
       where: { id: currentUserId },
       select: this.userSelectedFields,
@@ -78,6 +80,23 @@ export class UsersService {
     });
     if (!user) throw new BadRequestException('User not found');
     return user;
+  }
+
+  async updateUser(
+    id: number,
+    dto: UpdateUserDTO,
+    userId: number,
+  ): Promise<UserWithOutPassword> {
+    const { password } = dto;
+    await this.findOneUserWithSameCompany(id, userId);
+    const hash = await bcrypt.hash(password, 10);
+    const updatedUser = await this.prismaService.user.update({
+      where: { id: id },
+      data: { ...dto, password: hash },
+      select: this.userSelectedFields,
+    });
+
+    return updatedUser;
   }
 
   // getter function
