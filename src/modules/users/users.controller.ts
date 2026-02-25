@@ -72,7 +72,9 @@ export class UsersController {
   async deleteUser(
     @Param('id', ParseIntPipe) id: number,
     @Req() req: AuthUser,
-  ): Promise<any> {
+  ): Promise<{ message: string }> {
     const { userId } = req.user;
+    await this.usersService.deleteUser(id, userId);
+    return { message: 'User deleted successfully' };
   }
 }
