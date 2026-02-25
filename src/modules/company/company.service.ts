@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Company } from '@prisma/client';
 import { PrismaService } from 'src/common/prisma.service';
 import { UpdateCompanyDTO } from './dto/updateCompany.dto';
@@ -32,6 +36,7 @@ export class CompanyService {
     const company = await this.prismaService.company.findUnique({
       where: { id: companyId },
     });
+    if (!company) throw new NotFoundException('Company not found');
     const user = await this.userService.findUserById(userId);
     if (company.id !== user.companyId)
       throw new BadRequestException('You can only update your own company.');
@@ -41,5 +46,19 @@ export class CompanyService {
       data: { ...dto },
     });
     return updatedCompany;
+  }
+
+  async deleteOwnCompany(
+    companyId: number,
+    currentUserId: number,
+  ): Promise<void> {
+    const company = await this.prismaService.company.findUnique({
+      where: { id: companyId },
+    });
+    if (!company) throw new NotFoundException('Company not found');
+    const user = await this.userService.findUserById(currentUserId);
+    if (company.id !== user.companyId)
+      throw new BadRequestException('You can only delete your own company.');
+    await this.prismaService.company.delete({ where: { id: company.id } });
   }
 }
