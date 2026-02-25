@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -48,5 +49,17 @@ export class CompanyController {
       dto,
     );
     return { message: 'Updated Successfully', data: updatedCompany };
+  }
+
+  @Delete(':companyId')
+  @Roles(Role.Admin)
+  @HttpCode(HttpStatus.OK)
+  async deleteOwnCompany(
+    @Param('companyId', ParseIntPipe) companyId: number,
+    @Req() req: AuthUser,
+  ): Promise<{ message: string }> {
+    const { userId } = req.user;
+    await this.companyService.deleteOwnCompany(companyId, userId);
+    return { message: 'Company deleted successfully.' };
   }
 }
