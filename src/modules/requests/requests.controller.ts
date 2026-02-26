@@ -4,4 +4,9 @@ import { RequestsService } from './requests.service';
 @Controller('requests')
 export class RequestsController {
   constructor(private readonly requestsService: RequestsService) {}
+
+
+  async CreateRequest():Promise<any>{
+    
+  }
 }

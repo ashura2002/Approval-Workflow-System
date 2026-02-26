@@ -11,11 +11,3 @@ import { JwtModule } from '@nestjs/jwt';
   exports: [UsersService],
 })
 export class UsersModule {}
-
-// todo
-// company modules
-// request modules
-// approval workflow
-
-// progress
-// delete

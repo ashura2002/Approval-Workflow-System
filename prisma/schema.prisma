@@ -16,15 +16,29 @@ enum Role {
   Employee
 }
 
+enum LeaveType {
+  SickLeave
+  EmergencyLeave
+  PersonalLeave
+  Others
+}
+
+enum RequestStatus {
+  Pending
+  Approved
+  Rejected
+}
+
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique()
+  id        Int       @id @default(autoincrement())
+  username  String    @unique()
   password  String
-  email     String   @unique()
+  email     String    @unique()
   profile   Profile?
-  role      Role     @default(Employee)
-  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  role      Role      @default(Employee)
+  company   Company?  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   companyId Int?
+  requests  Request[]
 }
 
 model Profile {
@@ -44,4 +58,17 @@ model Company {
   companyName String @unique
   description String
   user        User[]
+}
+
+model Request {
+  id        Int           @id @default(autoincrement())
+  leaveType LeaveType
+  startDate DateTime
+  endDate   DateTime
+  reason    String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  status    RequestStatus @default(Pending)
+  userId    Int
+  user      User          @relation(fields: [userId], references: [id])
 }
