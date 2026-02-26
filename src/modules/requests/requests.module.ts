@@ -3,7 +3,16 @@ import { RequestsService } from './requests.service';
 import { RequestsController } from './requests.controller';
 
 @Module({
+  imports: [],
   controllers: [RequestsController],
   providers: [RequestsService],
+  exports: [RequestsService],
 })
 export class RequestsModule {}
+// todo
+// request modules
+// approval workflow
+
+// progress
+// delete
+// company modules

@@ -12,6 +12,7 @@ import { CompanyModule } from './modules/company/company.module';
     UsersModule,
     RequestsModule,
     CompanyModule,
+    RequestsModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
