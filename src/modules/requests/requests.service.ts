@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma.service';
 import { CreateRequestDTO } from './dto/createRequest.dto';
 import { Request, Role } from '@prisma/client';
@@ -23,5 +27,14 @@ export class RequestsService {
     return await this.prismaService.request.findMany({
       where: { userId },
     });
+  }
+
+  async getRequestById(requestId: number): Promise<Request> {
+    const request = await this.prismaService.request.findUnique({
+      where: { id: requestId },
+    });
+
+    if (!request) throw new NotFoundException('Request not found');
+    return request;
   }
 }

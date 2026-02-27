@@ -4,6 +4,8 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseIntPipe,
   Post,
   Req,
   UseGuards,
@@ -41,4 +43,16 @@ export class RequestsController {
     const { userId } = req.user;
     return await this.requestsService.getAllMyRequest(userId);
   }
+
+  @Get(':requestId')
+  @HttpCode(HttpStatus.OK)
+  async getRequestById(
+    @Param('requestId', ParseIntPipe) requestId: number,
+  ): Promise<Request> {
+    return await this.requestsService.getRequestById(requestId);
+  }
+
+  // TO DO
+  // UPDATE -> For approvers only
+  // DELETE FOR EMPLOYEE only
 }
