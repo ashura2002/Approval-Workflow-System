@@ -9,7 +9,7 @@ export class RequestsService {
 
   async CreateRequest(dto: CreateRequestDTO, userId: number): Promise<Request> {
     const { startDate, endDate } = dto;
-    if (startDate > endDate)
+    if (startDate >= endDate)
       throw new BadRequestException('Start date must be lower than end date');
 
     const newRequest = await this.prismaService.request.create({
