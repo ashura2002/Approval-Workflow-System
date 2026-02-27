@@ -18,4 +18,10 @@ export class RequestsService {
     });
     return newRequest;
   }
+
+  async getAllMyRequest(userId: number): Promise<Request[]> {
+    return await this.prismaService.request.findMany({
+      where: { userId },
+    });
+  }
 }

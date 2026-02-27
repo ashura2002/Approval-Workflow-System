@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -31,5 +32,13 @@ export class RequestsController {
     const { userId } = req.user;
     const leaveRequest = await this.requestsService.CreateRequest(dto, userId);
     return { message: 'Submitted Successfully', data: leaveRequest };
+  }
+
+  @Get('my-records')
+  @HttpCode(HttpStatus.OK)
+  @Roles(Role.Employee)
+  async getAllMyRequest(@Req() req: AuthUser): Promise<Request[]> {
+    const { userId } = req.user;
+    return await this.requestsService.getAllMyRequest(userId);
   }
 }
