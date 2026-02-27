@@ -13,10 +13,5 @@ import { PrismaService } from 'src/common/prisma.service';
 export class RequestsModule {}
 // todo
 // request modules
+// FOR THE APPROVERS -> if users want to get all request it will filter by there companyId to ensure that they get there own data
 // approval workflow
-// if users want to get all request it will filter by there companyId to ensure that they get there own data
-
-// progress
-// delete
-// company modules
-// added create request

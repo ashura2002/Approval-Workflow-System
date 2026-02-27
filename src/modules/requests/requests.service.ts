@@ -8,6 +8,7 @@ export class RequestsService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async CreateRequest(dto: CreateRequestDTO, userId: number): Promise<Request> {
+    // need to check first if the current user sending a request is has an request on that sched he/she fill up
     const { startDate, endDate } = dto;
     if (startDate >= endDate)
       throw new BadRequestException('Start date must be lower than end date');

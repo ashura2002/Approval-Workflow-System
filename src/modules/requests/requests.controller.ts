@@ -14,6 +14,7 @@ import { Roles } from 'src/common/decorators/role.decorator';
 import { Request, Role } from '@prisma/client';
 import { CreateRequestDTO } from './dto/createRequest.dto';
 import { AuthUser } from 'src/common/types/auth.user.types';
+import { ControllerResponse } from 'src/common/types/controller.response.type';
 
 @Controller('requests')
 @UseGuards(JwtGuard, RolesGuard)
@@ -26,8 +27,9 @@ export class RequestsController {
   async CreateRequest(
     @Body() dto: CreateRequestDTO,
     @Req() req: AuthUser,
-  ): Promise<Request> {
+  ): Promise<ControllerResponse<Request>> {
     const { userId } = req.user;
-    return await this.requestsService.CreateRequest(dto, userId);
+    const leaveRequest = await this.requestsService.CreateRequest(dto, userId);
+    return { message: 'Submitted Successfully', data: leaveRequest };
   }
 }
