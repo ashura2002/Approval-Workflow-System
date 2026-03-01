@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -18,6 +20,7 @@ import { Request, Role } from '@prisma/client';
 import { CreateRequestDTO } from './dto/createRequest.dto';
 import { AuthUser } from 'src/common/types/auth.user.types';
 import { ControllerResponse } from 'src/common/types/controller.response.type';
+import { UpdateRequestDTO } from './dto/updateRequest.dto';
 
 @Controller('requests')
 @UseGuards(JwtGuard, RolesGuard)
@@ -43,6 +46,33 @@ export class RequestsController {
     const { userId } = req.user;
     return await this.requestsService.getAllMyRequest(userId);
   }
+
+  @Patch(':requestId')
+  @Roles(Role.Admin, Role.DepartmentHead, Role.HR)
+  @HttpCode(HttpStatus.OK)
+  async approveRequest(
+    @Param('requestId', ParseIntPipe) requestId: number,
+    @Req() req: AuthUser,
+    @Body() dto: UpdateRequestDTO,
+  ): Promise<any> {
+    const { userId } = req.user;
+    return await this.requestsService.approveRequest(requestId, userId, dto);
+  }
+
+  @Get('pending-requests')
+  @Roles(Role.Admin, Role.DepartmentHead, Role.HR)
+  async getPendingRequest(@Req() req: AuthUser): Promise<any> {
+    const { role } = req.user;
+    return await this.requestsService.getPendingRequest(role as Role);
+  }
+
+  @Delete('requestId')
+  @HttpCode(HttpStatus.OK)
+  @Roles(Role.Employee, Role.Admin)
+  async deleteRequest(
+    @Param('requestId', ParseIntPipe) requestId: number,
+    @Req() req: AuthUser,
+  ): Promise<any> {}
 
   @Get(':requestId')
   @HttpCode(HttpStatus.OK)
