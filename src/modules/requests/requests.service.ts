@@ -6,10 +6,15 @@ import {
 import { PrismaService } from 'src/common/prisma.service';
 import { CreateRequestDTO } from './dto/createRequest.dto';
 import { Request, Role } from '@prisma/client';
+import { UpdateRequestDTO } from './dto/updateRequest.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class RequestsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly userService: UsersService,
+  ) {}
 
   async CreateRequest(dto: CreateRequestDTO, userId: number): Promise<Request> {
     // need to check first if the current user sending a request is has an request on that sched he/she fill up
@@ -36,5 +41,37 @@ export class RequestsService {
 
     if (!request) throw new NotFoundException('Request not found');
     return request;
+  }
+
+  async approveRequest(
+    requestId: number,
+    userId: number,
+    dto: UpdateRequestDTO,
+  ): Promise<any> {
+    const approver = await this.userService.getUserById(userId);
+    console.log(approver);
+  }
+
+  // fix this service make it readable
+  async getPendingRequest(role: Role): Promise<any> {
+    let condition: any = {};
+
+    if (role === 'DepartmentHead') {
+      condition = { viewTo: Role.DepartmentHead };
+    }
+
+    if (role === 'HR') {
+      condition = { viewTo: Role.HR };
+    }
+
+    if (role === 'Admin') {
+      condition = { viewTo: Role.Admin };
+    }
+
+    const pendingRequests = await this.prismaService.request.findMany({
+      where: condition,
+    });
+
+    return pendingRequests;
   }
 }
