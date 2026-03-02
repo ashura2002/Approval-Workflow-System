@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma.service';
 import { CreateRequestDTO } from './dto/createRequest.dto';
-import { Request, Role } from '@prisma/client';
+import { Request, RequestStatus, Role } from '@prisma/client';
 import { UpdateRequestDTO } from './dto/updateRequest.dto';
 import { UsersService } from '../users/users.service';
 
@@ -43,35 +43,17 @@ export class RequestsService {
     return request;
   }
 
-  async approveRequest(
-    requestId: number,
-    userId: number,
-    dto: UpdateRequestDTO,
-  ): Promise<any> {
+  async approveRequest(requestId: number, userId: number): Promise<any> {
     const approver = await this.userService.getUserById(userId);
-    console.log(approver);
   }
 
-  // fix this service make it readable
-  async getPendingRequest(role: Role): Promise<any> {
-    let condition: any = {};
-
-    if (role === 'DepartmentHead') {
-      condition = { viewTo: Role.DepartmentHead };
-    }
-
-    if (role === 'HR') {
-      condition = { viewTo: Role.HR };
-    }
-
-    if (role === 'Admin') {
-      condition = { viewTo: Role.Admin };
-    }
-
-    const pendingRequests = await this.prismaService.request.findMany({
-      where: condition,
+  async getPendingRequest(role: Role): Promise<Request[]> {
+    const pendingRequest = await this.prismaService.request.findMany({
+      where: {
+        status: RequestStatus.Pending,
+        viewTo: role,
+      },
     });
-
-    return pendingRequests;
+    return pendingRequest;
   }
 }
