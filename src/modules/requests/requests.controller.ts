@@ -53,15 +53,14 @@ export class RequestsController {
   async approveRequest(
     @Param('requestId', ParseIntPipe) requestId: number,
     @Req() req: AuthUser,
-    @Body() dto: UpdateRequestDTO,
   ): Promise<any> {
     const { userId } = req.user;
-    return await this.requestsService.approveRequest(requestId, userId, dto);
+    return await this.requestsService.approveRequest(requestId, userId);
   }
 
   @Get('pending-requests')
   @Roles(Role.Admin, Role.DepartmentHead, Role.HR)
-  async getPendingRequest(@Req() req: AuthUser): Promise<any> {
+  async getPendingRequest(@Req() req: AuthUser): Promise<Request[]> {
     const { role } = req.user;
     return await this.requestsService.getPendingRequest(role as Role);
   }
