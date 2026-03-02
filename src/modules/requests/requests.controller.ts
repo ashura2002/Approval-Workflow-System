@@ -47,16 +47,22 @@ export class RequestsController {
     return await this.requestsService.getAllMyRequest(userId);
   }
 
-  @Patch(':requestId')
+  @Patch('approved/:requestId')
   @Roles(Role.Admin, Role.DepartmentHead, Role.HR)
   @HttpCode(HttpStatus.OK)
   async approveRequest(
     @Param('requestId', ParseIntPipe) requestId: number,
     @Req() req: AuthUser,
-  ): Promise<any> {
-    const { userId } = req.user;
-    return await this.requestsService.approveRequest(requestId, userId);
+  ): Promise<{ message: string }> {
+    const { role, userId } = req.user;
+    await this.requestsService.approveRequest(requestId, role as Role, userId);
+    return { message: 'Approved Successfully' };
   }
+
+  @Patch('reject/:requestId')
+  @Roles(Role.Admin, Role.DepartmentHead, Role.HR)
+  @HttpCode(HttpStatus.OK)
+  async rejectRequest(): Promise<any> {}
 
   @Get('pending-requests')
   @Roles(Role.Admin, Role.DepartmentHead, Role.HR)
