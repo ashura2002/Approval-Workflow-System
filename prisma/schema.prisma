@@ -54,10 +54,11 @@ model Profile {
 }
 
 model Company {
-  id          Int    @id @default(autoincrement())
-  companyName String @unique
+  id          Int       @id @default(autoincrement())
+  companyName String    @unique
   description String
   user        User[]
+  requests    Request[]
 }
 
 model Request {
@@ -71,5 +72,7 @@ model Request {
   status    RequestStatus @default(Pending)
   userId    Int
   user      User          @relation(fields: [userId], references: [id])
-  viewTo    Role          @default(DepartmentHead)
+  viewTo    Role?         @default(DepartmentHead)
+  companyId Int
+  company   Company       @relation(fields: [companyId], references: [id])
 }
