@@ -61,7 +61,17 @@ export class RequestsController {
   @Patch('reject/:requestId')
   @Roles(Role.Admin, Role.DepartmentHead, Role.HR)
   @HttpCode(HttpStatus.OK)
-  async rejectRequest(): Promise<any> {}
+  async rejectRequest(
+    @Param('requestId', ParseIntPipe) requestId: number,
+    @Req() req: AuthUser,
+  ): Promise<any> {
+    const { role, userId } = req.user;
+    return await this.requestsService.rejectRequest(
+      requestId,
+      userId, 
+      role as Role,
+    );
+  }
 
   @Get('archive-requests')
   @Roles(Role.Admin)
