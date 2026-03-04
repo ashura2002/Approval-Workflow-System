@@ -7,7 +7,6 @@ import {
 import { PrismaService } from 'src/common/prisma.service';
 import { CreateRequestDTO } from './dto/createRequest.dto';
 import { Request, RequestStatus, Role } from '@prisma/client';
-import { UpdateRequestDTO } from './dto/updateRequest.dto';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -89,7 +88,33 @@ export class RequestsService {
     });
   }
 
-  async rejectRequest(): Promise<any> {}
+  async rejectRequest(
+    requestId: number,
+    userId: number,
+    role: Role,
+  ): Promise<any> {
+    const currentUser = await this.userService.findUserById(userId);
+    const request = await this.getRequestById(requestId);
+    const requester = await this.userService.findUserById(userId);
+
+    console.log({
+      currentUser,
+      request,
+      requester,
+    });
+
+    if (currentUser.companyId !== requester.companyId)
+      throw new ForbiddenException(
+        'You can only decide leave request on your company',
+      );
+
+    if (request.status !== RequestStatus.Pending)
+      throw new BadRequestException('Request is no longer pending');
+    if (request.viewTo !== role)
+      throw new ForbiddenException(
+        'You are not authorized to approve this request',
+      );
+  }
 
   async getAllArchiveRequests(userId: number): Promise<Request[]> {
     const adminUser = await this.userService.findUserById(userId);
@@ -106,7 +131,7 @@ export class RequestsService {
       archivesRequests.map((u) =>
         u.companyId === adminUser.companyId
           ? 'SAME COMPANY'
-          : 'MUST NOT BE VISIBLE',
+          : 'MUST NOT VISIBLE',
       ),
     );
     return archivesRequests;
