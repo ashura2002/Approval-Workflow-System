@@ -97,6 +97,13 @@ export class RequestsController {
     return { message: 'Deleted Successfully' };
   }
 
+  @Delete('delete-all')
+  @HttpCode(HttpStatus.OK)
+  @Roles(Role.Employee)
+  async deleteAllMyRequest(@Req() req: AuthUser): Promise<any> {
+    const { userId } = req.user;
+  }
+
   @Get(':requestId')
   @HttpCode(HttpStatus.OK)
   async getRequestById(
