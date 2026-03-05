@@ -87,11 +87,15 @@ export class RequestsController {
 
   @Delete(':requestId')
   @HttpCode(HttpStatus.OK)
-  @Roles(Role.Employee, Role.Admin)
+  @Roles(Role.Employee)
   async deleteRequest(
     @Param('requestId', ParseIntPipe) requestId: number,
     @Req() req: AuthUser,
-  ): Promise<any> {}
+  ): Promise<{ message: string }> {
+    const { userId } = req.user;
+    await this.requestsService.deleteOwnRequest(requestId, userId);
+    return { message: 'Deleted Successfully' };
+  }
 
   @Get(':requestId')
   @HttpCode(HttpStatus.OK)
@@ -100,8 +104,4 @@ export class RequestsController {
   ): Promise<Request> {
     return await this.requestsService.getRequestById(requestId);
   }
-
-  // TO DO
-  // UPDATE -> For approvers only
-  // DELETE FOR EMPLOYEE only
 }
