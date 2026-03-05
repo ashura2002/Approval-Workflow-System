@@ -64,13 +64,10 @@ export class RequestsController {
   async rejectRequest(
     @Param('requestId', ParseIntPipe) requestId: number,
     @Req() req: AuthUser,
-  ): Promise<any> {
+  ): Promise<{ message: string }> {
     const { role, userId } = req.user;
-    return await this.requestsService.rejectRequest(
-      requestId,
-      userId, 
-      role as Role,
-    );
+    await this.requestsService.rejectRequest(requestId, userId, role as Role);
+    return { message: 'Rejected Successfully' };
   }
 
   @Get('archive-requests')

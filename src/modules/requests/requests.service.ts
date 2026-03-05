@@ -92,16 +92,10 @@ export class RequestsService {
     requestId: number,
     userId: number,
     role: Role,
-  ): Promise<any> {
+  ): Promise<void> {
     const currentUser = await this.userService.findUserById(userId);
     const request = await this.getRequestById(requestId);
     const requester = await this.userService.findUserById(userId);
-
-    console.log({
-      currentUser,
-      request,
-      requester,
-    });
 
     if (currentUser.companyId !== requester.companyId)
       throw new ForbiddenException(
@@ -114,13 +108,21 @@ export class RequestsService {
       throw new ForbiddenException(
         'You are not authorized to approve this request',
       );
+
+    await this.prismaService.request.update({
+      where: { id: request.id },
+      data: {
+        viewTo: null,
+        status: RequestStatus.Rejected,
+      },
+    });
   }
 
   async getAllArchiveRequests(userId: number): Promise<Request[]> {
     const adminUser = await this.userService.findUserById(userId);
     const archivesRequests = await this.prismaService.request.findMany({
       where: {
-        status: RequestStatus.Approved,
+        viewTo: null,
         user: {
           companyId: adminUser.companyId,
         },
