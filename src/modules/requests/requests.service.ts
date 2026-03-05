@@ -118,6 +118,16 @@ export class RequestsService {
     });
   }
 
+  async deleteOwnRequest(requestId: number, userId: number): Promise<void> {
+    const request = await this.getRequestById(requestId);
+    const currentUser = await this.userService.getUserById(userId);
+    if (request.userId !== currentUser.id)
+      throw new BadRequestException('You can only delete your own requests');
+    await this.prismaService.request.delete({
+      where: { id: request.id },
+    });
+  }
+
   async getAllArchiveRequests(userId: number): Promise<Request[]> {
     const adminUser = await this.userService.findUserById(userId);
     const archivesRequests = await this.prismaService.request.findMany({
