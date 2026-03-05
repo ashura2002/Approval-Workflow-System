@@ -128,6 +128,8 @@ export class RequestsService {
     });
   }
 
+  async deleteAllMyRequest(userId: number): Promise<any> {}
+
   async getAllArchiveRequests(userId: number): Promise<Request[]> {
     const adminUser = await this.userService.findUserById(userId);
     const archivesRequests = await this.prismaService.request.findMany({
