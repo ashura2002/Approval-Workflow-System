@@ -12,8 +12,3 @@ import { UsersModule } from '../users/users.module';
   exports: [RequestsService],
 })
 export class RequestsModule {}
-// todo
-// request modules
-// FOR THE APPROVERS -> if users want to get all request it will filter by there companyId to ensure that they get there own data
-// add background job to delete all request that the endate is greater than the current date
-// approval workflow
