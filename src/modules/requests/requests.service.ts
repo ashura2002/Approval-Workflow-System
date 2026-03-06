@@ -128,7 +128,13 @@ export class RequestsService {
     });
   }
 
-  async deleteAllMyRequest(userId: number): Promise<any> {}
+  async deleteAllMyRequest(userId: number): Promise<void> {
+    const { count } = await this.prismaService.request.deleteMany({
+      where: { userId },
+    });
+    if (count === 0)
+      throw new BadRequestException('You have no existing requests');
+  }
 
   async getAllArchiveRequests(userId: number): Promise<Request[]> {
     const adminUser = await this.userService.findUserById(userId);
