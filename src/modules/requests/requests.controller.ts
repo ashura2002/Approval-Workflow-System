@@ -85,6 +85,15 @@ export class RequestsController {
     return await this.requestsService.getPendingRequest(role as Role);
   }
 
+  @Delete('delete-all')
+  @HttpCode(HttpStatus.OK)
+  @Roles(Role.Employee)
+  async deleteAllMyRequest(@Req() req: AuthUser): Promise<{ message: string }> {
+    const { userId } = req.user;
+    await this.requestsService.deleteAllMyRequest(userId);
+    return { message: 'All Request Deleted Successfully' };
+  }
+
   @Delete(':requestId')
   @HttpCode(HttpStatus.OK)
   @Roles(Role.Employee)
@@ -95,13 +104,6 @@ export class RequestsController {
     const { userId } = req.user;
     await this.requestsService.deleteOwnRequest(requestId, userId);
     return { message: 'Deleted Successfully' };
-  }
-
-  @Delete('delete-all')
-  @HttpCode(HttpStatus.OK)
-  @Roles(Role.Employee)
-  async deleteAllMyRequest(@Req() req: AuthUser): Promise<any> {
-    const { userId } = req.user;
   }
 
   @Get(':requestId')
