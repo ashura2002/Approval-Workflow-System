@@ -1,16 +1,20 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
+  ParseIntPipe,
+  Patch,
   Post,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { AuthUser } from 'src/common/types/auth.user.types';
-import { CreateProfileDTO } from './dto/createProfile.dto';
+import { ProfileDTO } from './dto/createProfile.dto';
 import { JwtGuard } from 'src/common/guard/jwt.guard';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { ControllerResponse } from 'src/common/types/controller.response.type';
@@ -25,7 +29,7 @@ export class ProfileController {
   @HttpCode(HttpStatus.CREATED)
   async createProfile(
     @Req() req: AuthUser,
-    @Body() dto: CreateProfileDTO,
+    @Body() dto: ProfileDTO,
   ): Promise<ControllerResponse<Profile>> {
     const { userId } = req.user;
     const profile = await this.profileService.createProfile(userId, dto);
@@ -38,4 +42,21 @@ export class ProfileController {
     const { userId } = req.user;
     return await this.profileService.getCurrentProfile(userId);
   }
+
+  @Patch()
+  @HttpCode(HttpStatus.OK)
+  async updateProfile(
+    @Req() req: AuthUser,
+    @Body() dto: ProfileDTO,
+  ): Promise<{ message: string }> {
+    const { userId } = req.user;
+    await this.profileService.updateProfile(userId, dto);
+    return { message: 'Profile Updated Successfully' };
+  }
+
+  @Delete(':profileId')
+  @HttpCode(HttpStatus.OK)
+  async deleteProfile(
+    @Param('profileId', ParseIntPipe) profileId: number,
+  ): Promise<any> {}
 }
