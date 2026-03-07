@@ -32,7 +32,12 @@ export class ProfileService {
   }
 
   async getCurrentProfile(userId: number): Promise<Profile> {
-    return await this.getProfileById(userId);
+    const profile = await this.getProfileById(userId);
+    if (!profile)
+      throw new NotFoundException(
+        'Profile not found, Create Profile your profile first',
+      );
+    return profile;
   }
 
   async updateProfile(userId: number, dto: ProfileDTO): Promise<void> {
@@ -44,5 +49,12 @@ export class ProfileService {
     });
   }
 
-  async deleteProfile(profileId: number): Promise<any> {}
+  async deleteProfile(userId: number): Promise<void> {
+    const profile = await this.getProfileById(userId);
+    if (!profile)
+      throw new BadRequestException('Profile is already deleted, Not Found');
+    await this.prismaService.profile.delete({
+      where: { id: profile.id },
+    });
+  }
 }
