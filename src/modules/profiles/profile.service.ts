@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
-  UseGuards,
 } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma.service';
 import { ProfileDTO } from './dto/createProfile.dto';

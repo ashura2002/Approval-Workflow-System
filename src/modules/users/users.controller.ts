@@ -78,3 +78,7 @@ export class UsersController {
     return { message: 'User deleted successfully' };
   }
 }
+// to do
+// create docker image
+// create docker compose
+// create frontend
