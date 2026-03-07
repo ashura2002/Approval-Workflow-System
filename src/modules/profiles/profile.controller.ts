@@ -54,9 +54,11 @@ export class ProfileController {
     return { message: 'Profile Updated Successfully' };
   }
 
-  @Delete(':profileId')
+  @Delete()
   @HttpCode(HttpStatus.OK)
-  async deleteProfile(
-    @Param('profileId', ParseIntPipe) profileId: number,
-  ): Promise<any> {}
+  async deleteProfile(@Req() req: AuthUser): Promise<{ message: string }> {
+    const { userId } = req.user;
+    await this.profileService.deleteProfile(userId);
+    return { message: 'Own profile deleted successfully' };
+  }
 }
