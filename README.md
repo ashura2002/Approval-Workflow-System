@@ -19,17 +19,23 @@ POST	/auth/register-employee	Register employee
 POST	/auth/register-departmentHead	Register department head
 POST	/auth/register-departmentHead	Register HR
 POST	/auth/login	Login → returns JWT token
+
+
 🏢 COMPANY
 Method	Endpoint	Description
 GET	/company	Get own company
 PATCH	/company/:id	Update company (Admin)
 DELETE	/company/:id	Delete company (Admin)
+
+
 👥 USERS
 Method	Endpoint	Description
 GET	/users/current	Get current user
 GET	/users/own-company	Get all users in company
 PATCH	/users/details/:id	Update user
 DELETE	/users/details/:id	Delete user (Admin)
+
+
 📝 REQUESTS
 Method	Endpoint	Description
 POST	/requests	Create request
@@ -41,6 +47,8 @@ PATCH	/requests/approved/:id	Approve request
 PATCH	/requests/reject/:id	Reject request
 DELETE	/requests/:id	Delete own request
 DELETE	/requests/delete-all	Delete all own requests
+
+
 👤 PROFILE
 Method	Endpoint	Description
 POST	/profile	Create profile
@@ -53,10 +61,12 @@ ADMIN	Full access, company & user management
 DEPARTMENT_HEAD	Approve/reject department requests
 HR	Manage profiles, approve HR requests
 EMPLOYEE	Create requests, manage own profile
+
 Database Models
 User ──┬── Profile (1:1)       └── Request (1:N)       └── Company (N:1)
-Enums:
 
+
+Enums:
 Role: ADMIN, DEPARTMENT_HEAD, HR, EMPLOYEE
 RequestStatus: PENDING, APPROVED, REJECTED
 RequestType: LEAVE, EQUIPMENT, BUDGET, TRAVEL, OTHER
