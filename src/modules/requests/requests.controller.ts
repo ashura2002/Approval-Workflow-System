@@ -20,8 +20,10 @@ import { Request, Role } from '@prisma/client';
 import { CreateRequestDTO } from './dto/createRequest.dto';
 import { AuthUser } from 'src/common/types/auth.user.types';
 import { ControllerResponse } from 'src/common/types/controller.response.type';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('requests')
+@ApiBearerAuth('access-token')
 @UseGuards(JwtGuard, RolesGuard)
 export class RequestsController {
   constructor(private readonly requestsService: RequestsService) {}

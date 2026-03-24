@@ -37,6 +37,7 @@ export class UsersController {
 
   @Get('own-company')
   @HttpCode(HttpStatus.OK)
+  @Roles(Role.Admin, Role.HR)
   async getAllUsersOnOwnCompany(
     @Req() req: AuthUser,
   ): Promise<UserWithOutPassword[]> {

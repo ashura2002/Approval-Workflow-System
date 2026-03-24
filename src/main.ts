@@ -46,3 +46,6 @@ async function bootstrap() {
   console.log(`Server is running on http://localhost:${port}`);
 }
 bootstrap();
+
+// todo
+// put isActive meta data for every user to filter active users and add green div circle
