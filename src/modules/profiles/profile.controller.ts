@@ -19,8 +19,10 @@ import { JwtGuard } from 'src/common/guard/jwt.guard';
 import { RolesGuard } from 'src/common/guard/role.guard';
 import { ControllerResponse } from 'src/common/types/controller.response.type';
 import { Profile } from '@prisma/client';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('profile')
+@ApiBearerAuth('access-token')
 @UseGuards(JwtGuard, RolesGuard)
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
