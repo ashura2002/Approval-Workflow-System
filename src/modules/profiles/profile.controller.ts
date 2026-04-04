@@ -13,13 +13,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
-import { AuthUser } from 'src/common/types/auth.user.types';
 import { ProfileDTO } from './dto/createProfile.dto';
-import { JwtGuard } from 'src/common/guard/jwt.guard';
-import { RolesGuard } from 'src/common/guard/role.guard';
-import { ControllerResponse } from 'src/common/types/controller.response.type';
 import { Profile } from '@prisma/client';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { JwtGuard } from '@/common/guard/jwt.guard';
+import { RolesGuard } from '@/common/guard/role.guard';
+import { AuthUser } from '@/common/types/auth.user.types';
+import { ControllerResponse } from '@/common/types/controller.response.type';
 
 @Controller('profile')
 @ApiBearerAuth('access-token')

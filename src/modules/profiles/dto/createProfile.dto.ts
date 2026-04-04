@@ -5,25 +5,25 @@ export class ProfileDTO {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  firstname: string;
+  firstname!: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  lastname: string;
+  lastname!: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsNumber()
-  age: number;
+  age!: number;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  address: string;
+  address!: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  contactNumber: string;
+  contactNumber!: string;
 }

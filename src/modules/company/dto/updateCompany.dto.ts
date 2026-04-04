@@ -4,9 +4,9 @@ import { IsNotEmpty } from 'class-validator';
 export class UpdateCompanyDTO {
   @ApiProperty()
   @IsNotEmpty()
-  companyName: string;
+  companyName!: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  description: string;
+  description!: string;
 }

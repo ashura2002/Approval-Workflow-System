@@ -13,14 +13,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { RequestsService } from './requests.service';
-import { JwtGuard } from 'src/common/guard/jwt.guard';
-import { RolesGuard } from 'src/common/guard/role.guard';
-import { Roles } from 'src/common/decorators/role.decorator';
 import { Request, Role } from '@prisma/client';
 import { CreateRequestDTO } from './dto/createRequest.dto';
-import { AuthUser } from 'src/common/types/auth.user.types';
-import { ControllerResponse } from 'src/common/types/controller.response.type';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { JwtGuard } from '@/common/guard/jwt.guard';
+import { RolesGuard } from '@/common/guard/role.guard';
+import { AuthUser } from '@/common/types/auth.user.types';
+import { Roles } from '@/common/decorators/role.decorator';
+import { ControllerResponse } from '@/common/types/controller.response.type';
 
 @Controller('requests')
 @ApiBearerAuth('access-token')

@@ -23,9 +23,11 @@ export class CompanyService {
   }
 
   async getOwnCompany(companyId: number): Promise<Company> {
-    return await this.prismaService.company.findUnique({
+    const company = await this.prismaService.company.findUnique({
       where: { id: companyId },
     });
+    if (!company) throw new NotFoundException('Company not found');
+    return company;
   }
 
   async updateCompany(

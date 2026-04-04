@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ProfileController } from './profile.controller';
 import { ProfileService } from './profile.service';
-import { PrismaService } from 'src/common/prisma.service';
 import { JwtModule } from '@nestjs/jwt';
+import { PrismaService } from '@/common/prisma.service';
 
 @Module({
   imports: [JwtModule],
