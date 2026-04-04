@@ -13,14 +13,14 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserWithOutPassword } from '../auth/dto/userwithoutpassword.dto';
-import { AuthUser } from 'src/common/types/auth.user.types';
-import { JwtGuard } from 'src/common/guard/jwt.guard';
-import { Roles } from 'src/common/decorators/role.decorator';
-import { RolesGuard } from 'src/common/guard/role.guard';
 import { Role } from '@prisma/client';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { UpdateUserDTO } from './dto/updateUser.dto';
-import { ControllerResponse } from 'src/common/types/controller.response.type';
+import { AuthUser } from '@/common/types/auth.user.types';
+import { JwtGuard } from '@/common/guard/jwt.guard';
+import { RolesGuard } from '@/common/guard/role.guard';
+import { Roles } from '@/common/decorators/role.decorator';
+import { ControllerResponse } from '@/common/types/controller.response.type';
 
 @Controller('users')
 @ApiBearerAuth('access-token')
@@ -37,7 +37,7 @@ export class UsersController {
 
   @Get('own-company')
   @HttpCode(HttpStatus.OK)
-  @Roles(Role.Admin, Role.HR)
+  @Roles(Role.Admin, Role.HR, Role.DepartmentHead)
   async getAllUsersOnOwnCompany(
     @Req() req: AuthUser,
   ): Promise<UserWithOutPassword[]> {

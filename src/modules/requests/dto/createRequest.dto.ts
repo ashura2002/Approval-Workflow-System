@@ -7,19 +7,19 @@ export class CreateRequestDTO {
   @ApiProperty()
   @IsNotEmpty()
   @Type(() => Date)
-  startDate: Date;
+  startDate!: Date;
 
   @ApiProperty()
   @IsNotEmpty()
   @Type(() => Date)
-  endDate: Date;
+  endDate!: Date;
 
   @ApiProperty()
   @IsNotEmpty()
-  reason: string;
+  reason!: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsEnum(LeaveType)
-  leaveType: LeaveType;
+  leaveType!: LeaveType;
 }

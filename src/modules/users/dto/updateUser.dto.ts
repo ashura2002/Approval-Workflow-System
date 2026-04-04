@@ -5,14 +5,14 @@ import { IsEnum, IsNotEmpty } from 'class-validator';
 export class UpdateUserDTO {
   @ApiProperty()
   @IsNotEmpty()
-  username: string;
+  username!: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  password: string;
+  password!: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsEnum(Role)
-  role: Role;
+  role!: Role;
 }

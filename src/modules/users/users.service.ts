@@ -3,10 +3,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/common/prisma.service';
 import { UserWithOutPassword } from '../auth/dto/userwithoutpassword.dto';
 import { UpdateUserDTO } from './dto/updateUser.dto';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from '@/common/prisma.service';
 
 @Injectable()
 export class UsersService {
@@ -30,10 +30,12 @@ export class UsersService {
   }
 
   async findUserById(id: number): Promise<UserWithOutPassword> {
-    return await this.prismaService.user.findUnique({
+    const user = this.prismaService.user.findUnique({
       where: { id },
       select: this.userSelectedFields,
     });
+    if (!user) throw new NotFoundException('User not found');
+    return user;
   }
 
   async findOneUserWithSameCompany(

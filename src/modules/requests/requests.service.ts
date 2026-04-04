@@ -4,10 +4,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/common/prisma.service';
 import { CreateRequestDTO } from './dto/createRequest.dto';
 import { Request, RequestStatus, Role } from '@prisma/client';
 import { UsersService } from '../users/users.service';
+import { PrismaService } from '@/common/prisma.service';
 
 @Injectable()
 export class RequestsService {
@@ -19,19 +19,19 @@ export class RequestsService {
   async CreateRequest(dto: CreateRequestDTO, userId: number): Promise<Request> {
     // need to check first if the current user sending a request is has an request on that sched he/she fill up
     const requester = await this.userService.findUserById(userId);
+    console.log(requester);
     const { startDate, endDate } = dto;
     if (startDate >= endDate)
       throw new BadRequestException('Start date must be lower than end date');
 
-    const newRequest = await this.prismaService.request.create({
+    return await this.prismaService.request.create({
       data: {
         ...dto,
         viewTo: Role.DepartmentHead,
         userId,
-        companyId: requester.companyId,
+        companyId: requester.companyId!,
       },
     });
-    return newRequest;
   }
 
   async getAllMyRequest(userId: number): Promise<Request[]> {
