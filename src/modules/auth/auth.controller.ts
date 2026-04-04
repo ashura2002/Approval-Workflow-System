@@ -8,15 +8,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ControllerResponse } from 'src/common/types/controller.response.type';
 import { LoginDTO } from './dto/login.dto';
 import { UserWithOutPassword } from './dto/userwithoutpassword.dto';
 import { Role } from '@prisma/client';
-import { Roles } from 'src/common/decorators/role.decorator';
 import { RegisterAdminUserDTO } from './dto/registerAdminUser.dto';
-import { AuthUser } from 'src/common/types/auth.user.types';
-import { JwtGuard } from 'src/common/guard/jwt.guard';
 import { RegisterUserDTO } from './dto/registerUser.dto';
+import { ControllerResponse } from '@/common/types/controller.response.type';
+import { JwtGuard } from '@/common/guard/jwt.guard';
+import { Roles } from '@/common/decorators/role.decorator';
+import { AuthUser } from '@/common/types/auth.user.types';
 
 @Controller('auth')
 export class AuthController {

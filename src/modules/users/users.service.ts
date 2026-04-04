@@ -30,7 +30,7 @@ export class UsersService {
   }
 
   async findUserById(id: number): Promise<UserWithOutPassword> {
-    const user = this.prismaService.user.findUnique({
+    const user = await this.prismaService.user.findUnique({
       where: { id },
       select: this.userSelectedFields,
     });
@@ -69,10 +69,12 @@ export class UsersService {
   }
 
   async getCurrentUser(userId: number): Promise<UserWithOutPassword> {
-    return await this.prismaService.user.findUnique({
+    const user = await this.prismaService.user.findUnique({
       where: { id: userId },
       select: this.userSelectedFields,
     });
+    if (!user) throw new NotFoundException('User not found');
+    return user;
   }
 
   async getUserById(userId: number): Promise<UserWithOutPassword> {

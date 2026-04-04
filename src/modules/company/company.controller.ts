@@ -12,14 +12,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { JwtGuard } from 'src/common/guard/jwt.guard';
-import { AuthUser } from 'src/common/types/auth.user.types';
 import { CompanyService } from './company.service';
 import { Company, Role } from '@prisma/client';
 import { UpdateCompanyDTO } from './dto/updateCompany.dto';
-import { RolesGuard } from 'src/common/guard/role.guard';
-import { Roles } from 'src/common/decorators/role.decorator';
-import { ControllerResponse } from 'src/common/types/controller.response.type';
+import { JwtGuard } from '@/common/guard/jwt.guard';
+import { RolesGuard } from '@/common/guard/role.guard';
+import { AuthUser } from '@/common/types/auth.user.types';
+import { Roles } from '@/common/decorators/role.decorator';
+import { ControllerResponse } from '@/common/types/controller.response.type';
 
 @Controller('company')
 @ApiBearerAuth('access-token')

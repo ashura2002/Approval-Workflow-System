@@ -1,15 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/common/prisma.service';
 import { RegisterAdminUserDTO } from './dto/registerAdminUser.dto';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { LoginDTO } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { JwtResponseType } from 'src/common/types/IJwtResponse.type';
 import { UserWithOutPassword } from './dto/userwithoutpassword.dto';
 import { Role } from '@prisma/client';
 import { CompanyService } from '../company/company.service';
 import { RegisterUserDTO } from './dto/registerUser.dto';
+import { PrismaService } from '@/common/prisma.service';
+import { JwtResponseType } from '@/common/types/IJwtResponse.type';
 
 @Injectable()
 export class AuthService {
@@ -94,7 +94,7 @@ export class AuthService {
       username: existingUser.username,
       email: existingUser.email,
       role: existingUser.role,
-      companyId: existingUser.companyId,
+      companyId: existingUser.companyId!,
     };
     const accessToken = this.jwtService.sign(tokenPayload);
     return accessToken;
