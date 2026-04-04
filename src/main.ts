@@ -49,3 +49,4 @@ bootstrap();
 
 // todo
 // put isActive meta data for every user to filter active users and add green div circle
+// add tagline for the company
